@@ -1,63 +1,17 @@
 import { Box, Button, Text, TextField, Image } from '@skynexui/components';
-import React from 'react';
+import React, { useState } from 'react';
 import appConfig from '../config.json';
+import { useRouter } from 'next/router';
 
-/*
-    cores neutras antigas do config.json 
-        {
-          "000": "#FFFFFF",
-          "050": "#F5F7FA",
-          "100": "#E4E7EB",
-          "200": "#CBD2D9",
-          "300": "#9AA5B1",
-          "400": "#52667A",
-          "500": "#313D49",
-          "600": "#29333D",
-          "700": "#212931",
-          "800": "#181F25",
-          "900": "#101418",
-          "999": "#080A0C"
-        } 
-*/
-
-function GlobalStyle() {
-    return (
-        <style global jsx>{`
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        list-style: none;
-      }
-      body {
-        font-family: 'Open Sans', sans-serif;
-      }
-      /* App fit Height */ 
-      html, body, #__next {
-        min-height: 100vh;
-        display: flex;
-        flex: 1;
-      }
-      #__next {
-        flex: 1;
-      }
-      #__next > * {
-        flex: 1;
-      }
-      /* ./App fit Height */ 
-    `}</style>
-    );
-  }
 
 function Titulo(props) {
     const Tag = props.tag || 'h1';
     return (
       <>
-        <GlobalStyle/>
         <Tag>{props.children}</Tag>
         <style jsx>{`
               ${Tag} {
-                  color: ${appConfig.theme.colors.neutrals['200']};
+                  color: ${appConfig.theme.colors.neutrals['000']};
                   font-size: 24px;
                   font-weight: 600;
               }
@@ -67,7 +21,19 @@ function Titulo(props) {
   }
 
 export default function PaginaInicial() {
-    const username = 'juniorbragaj'
+    const [username, setUsername] = useState('juniorbragaj');
+    const routing = useRouter()
+
+    const [dadosDoGithub, setDadosDoGithub] = useState({});
+
+    React.useEffect (() => {
+        fetch (`https://api.github.com/users/${username}`)
+        .then((respostaDoServer) => {
+            return respostaDoServer.json();
+        }).then((respostaConvertida) => {
+            setDadosDoGithub(respostaConvertida)
+        })
+    }, [username])
 
     return (
         <>
@@ -97,23 +63,32 @@ export default function PaginaInicial() {
                     {/* Formulário */}
                     <Box
                         as="form"
+                        onSubmit={function (event) {
+                            event.preventDefault();
+                            routing.push('/chat')
+
+                        }}
                         styleSheet={{
                             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                             width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
                         }}
                     >
                         <Titulo>Boas vindas de volta!</Titulo>
-                        <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals['200'] }}>
+                        <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals['000'] }}>
                             {appConfig.name}
                         </Text>
 
                         <TextField
                             value={username}
+                            onChange={function (event) {
+                                const valor = event.target.value
+                                setUsername(valor)
+                            }}
                             fullWidth
                             textFieldColors={{
                                 neutral: {
-                                    textColor: appConfig.theme.colors.neutrals['200'],
-                                    mainColor: appConfig.theme.colors.neutrals['900'],
+                                    textColor: appConfig.theme.colors.neutrals['050'],
+                                    mainColor: appConfig.theme.colors.neutrals['000'],
                                     mainColorHighlight: appConfig.theme.colors.primary['500'],
                                     backgroundColor: appConfig.theme.colors.neutrals['800'],
                                 },
@@ -124,10 +99,10 @@ export default function PaginaInicial() {
                             label='Entrar'
                             fullWidth
                             buttonColors={{
-                                contrastColor: appConfig.theme.colors.neutrals['900'],
-                                mainColor: appConfig.theme.colors.primary['500'],
+                                contrastColor: appConfig.theme.colors.neutrals['000'],
+                                mainColor: appConfig.theme.colors.primary['050'],
                                 mainColorLight: appConfig.theme.colors.primary['400'],
-                                mainColorStrong: appConfig.theme.colors.primary['600'],
+                                backgroundColor: appConfig.theme.colors.neutrals['800'],
                             }}
                         />
                     </Box>
@@ -138,7 +113,7 @@ export default function PaginaInicial() {
                             alignItems: 'center',
                             maxWidth: '200px',
                             padding: '16px',
-                            backgroundColor: appConfig.theme.colors.neutrals['500'],
+                            backgroundColor: appConfig.theme.colors.primary['050'],
                             border: '1px solid',
                             borderColor: appConfig.theme.colors.neutrals['900'],
                             borderRadius: '10px',
@@ -154,16 +129,62 @@ export default function PaginaInicial() {
                             src={`https://github.com/${username}.png`}
                         />
                         <Text
-                            variant="body4"
+                            variant="body2"
                             styleSheet={{
-                                color: appConfig.theme.colors.neutrals['100'],
+                                color: appConfig.theme.colors.primary['000'],
                                 backgroundColor: appConfig.theme.colors.neutrals['800'],
+                                textAlign:'center',
                                 padding: '3px 10px',
-                                borderRadius: '1000px'
+                                borderRadius: '10px'
                             }}
                         >
-                            {username}
+                        {dadosDoGithub.name}
                         </Text>
+                        <Box
+                            styleSheet={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'space-between',
+                                textAlign: 'center',
+                                maxWidth: '200px',
+                                backgroundColor: appConfig.theme.colors.primary['050'],
+                            }}
+                        >
+                            <Text
+                                variant="body4"
+                                styleSheet={{
+                                    color: appConfig.theme.colors.primary['000'],
+                                    backgroundColor: appConfig.theme.colors.neutrals['800'],
+                                    margin: '3px',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    padding: '5px',
+                                    borderRadius: '10px'
+                                }}
+                                >
+                                <Text
+                                variant='heading5'
+                                >Localização:
+                                </Text> {dadosDoGithub.location ? dadosDoGithub.location : 'Indisponivel'}
+                            </Text>
+                            <Text
+                                variant="body4"
+                                styleSheet={{
+                                    color: appConfig.theme.colors.primary['000'],
+                                    backgroundColor: appConfig.theme.colors.neutrals['800'],
+                                    margin: '3px',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    padding: '5px',
+                                    borderRadius: '10px'
+                                }}
+                                >
+                                <Text
+                                variant='heading5'
+                                >Biografia:
+                                </Text> {dadosDoGithub.bio ? dadosDoGithub.bio : 'Indisponivel'}
+                            </Text>
+                        </Box>
                     </Box>
                 </Box>
             </Box>
