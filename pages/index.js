@@ -26,6 +26,9 @@ export default function PaginaInicial() {
 
     const [dadosDoGithub, setDadosDoGithub] = useState({});
 
+
+// Fica de olho toda vez que a variavel username muda ele faz requisicao para API
+// do github para pegar dados 
     React.useEffect (() => {
         fetch (`https://api.github.com/users/${username}`)
         .then((respostaDoServer) => {
@@ -65,7 +68,7 @@ export default function PaginaInicial() {
                         as="form"
                         onSubmit={function (event) {
                             event.preventDefault();
-                            routing.push('/chat')
+                            routing.push(`/chat?username=${username}`)
 
                         }}
                         styleSheet={{
